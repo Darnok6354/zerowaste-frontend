@@ -1,4 +1,4 @@
-
+"use client";
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../app/lib/supabase'
@@ -22,7 +22,7 @@ export default function HomePage() {
   // Zwracamy pusty ekran lub prosty napis na czas ułamka sekundy, gdy aplikacja sprawdza sesję
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <p className="text-gray-500 font-medium">Ładowanie aplikacji...</p>
+      <p className="text-gray-500 font-medium">Loading...</p>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export default function DashboardPage() {
         <DashboardStats />
 
         {/* Tabela "My fridge" wyląduje tutaj na dużych ekranach */}
-        <div className="hidden md:block mt-2">
+        <div className=" md:block mt-2">
             <MyFridgeList />
         </div>
       </div>
