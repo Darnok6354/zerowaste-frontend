@@ -10,6 +10,9 @@ interface Product {
   status: string;
   expirationDate?: string | null;
   imageUrl?: string | null;
+  lifecycleStatus?: string; // Dodane do sprawdzania czy zjedzone
+  masterProductId: number;  // Dodane
+  location: string;
 }
 
 async function getFridgeProducts(): Promise<Product[]> {

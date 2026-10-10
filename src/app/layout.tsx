@@ -3,6 +3,8 @@ import { Inter, Fahkwang } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/app/components/BottomNav";
 import TopBar from "@/app/components/TopBar";
+import { Toaster } from 'react-hot-toast';
+import ToastProvider from "@/app/components/ToastProvider";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 const fahkwang = Fahkwang({ 
@@ -32,6 +34,8 @@ export default function RootLayout({
         
         {/* Nasz nowy mobilny pasek nawigacyjny */}
         <BottomNav />
+        
+        <ToastProvider/>
       </body>
     </html>
   );
