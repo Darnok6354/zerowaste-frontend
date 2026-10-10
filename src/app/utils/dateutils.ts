@@ -13,9 +13,9 @@ export const getDaysUntilExpiration = (expirationDateString?: string | null): nu
 
 export const formatDaysLeft = (daysLeft: number | null): string => {
   if (daysLeft === null) return "No expiration date";
-  if (daysLeft === 0) return "Expires today";
+  if (daysLeft === 0) return "0 days";
   if (daysLeft < 0) return `Expired ${Math.abs(daysLeft)} days ago`;
-  if (daysLeft === 1) return "Expires in 1 day";
+  if (daysLeft === 1) return "1 day";
   
-  return `Expires in ${daysLeft} days`;
+  return `${daysLeft} days`;
 };

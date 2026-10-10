@@ -1,37 +1,89 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "../lib/supabase"; // Zaktualizuj ścieżkę, jeśli jest inna
 
-export default function LoginPage() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+export default function RegisterForm() {
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
+    setSuccess(false);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // 1. Rejestracja w Supabase (zwróci sukces, bo usunęliśmy trigger)
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+          },
+        },
+      });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
+      if (signUpError) throw signUpError;
+
+      if (
+        data.user &&
+        data.user.identities &&
+        data.user.identities.length === 0
+      ) {
+        setError("This account already exists.");
+        return;
+      }
+
+      // 2. Pobranie aktywnej sesji, aby zdobyć token JWT dla Spring Boota
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      // 3. Synchronizacja użytkownika z Twoją lokalną bazą w Dockerze
+      if (data.user && token) {
+        const syncResponse = await fetch(
+          "http://localhost:8080/api/users/sync",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              id: data.user.id, // Ważne: wysyłamy UUID z Supabase jako ID w Twojej bazie
+              email: formData.email,
+              firstName: formData.firstName,
+            }),
+          },
+        );
+
+        if (!syncResponse.ok) {
+          console.error(
+            "Error synchronizing user with Spring Boot",
+            await syncResponse.text(),
+          );
+          // Tutaj można obsłużyć błąd synchronizacji
+        }
+      }
+
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.message || "An error occurred during registration.");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Sukces logowania - Supabase automatycznie zapisuje sesję
-
-    // Przekierowanie do głównego widoku, np. spiżarni
-    router.push("/dashboard");
   };
 
   return (
@@ -39,15 +91,31 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-md">
         <div>
           <h2 className="text-center text-3xl font-bold text-gray-900">
-            Log in
+            Sign up
           </h2>
           <p className="mt-2 text-center text-sm font-medium text-gray-600">
             to your zero waste pantry
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleRegister}>
           <div className="space-y-4 rounded-md shadow-sm">
+            <div>
+              <label htmlFor="firstName" className="sr-only">
+                First Name
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                required
+                className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm font-medium"
+                placeholder="First Name"
+                value={formData.firstName}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
+              />
+            </div>
             <div>
               <label htmlFor="email" className="sr-only">
                 Email
@@ -58,8 +126,10 @@ export default function LoginPage() {
                 required
                 className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm font-medium"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
             <div>
@@ -70,10 +140,13 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 required
+                minLength={6}
                 className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm font-medium"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
               />
             </div>
           </div>
@@ -83,17 +156,21 @@ export default function LoginPage() {
               {error}
             </p>
           )}
+          {success && (
+            <p className="text-sm font-medium text-green-600 text-center">
+              Account created successfully! Please check your email.
+            </p>
+          )}
 
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isLoading || success}
               className="group relative flex w-full justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-70 transition-colors"
             >
-              {loading ? "Login..." : "Log in"}
+              {isLoading ? "Creating account..." : "Sign up"}
             </button>
           </div>
-
           <div className="relative mt-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200" />
@@ -141,17 +218,15 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* NOWA SEKCJA REJESTRACJI DODANA TUTAJ */}
         <div className="mt-6 text-center text-sm font-medium text-gray-600">
-          Don't have an account?{" "}
+          Already have an account?{" "}
           <Link
-            href="/register"
+            href="/login"
             className="text-green-600 hover:text-green-700 transition-colors"
           >
-            Sign up
+            Log in
           </Link>
         </div>
-        {/* KONIEC NOWEJ SEKCJI */}
       </div>
     </div>
   );
