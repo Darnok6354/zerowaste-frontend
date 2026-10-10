@@ -46,7 +46,7 @@ export default async function DashboardPage() {
             • Less waste, more good
           </p>
           <h1 className="text-4xl font-heading font-bold text-slate-800 mb-2">
-            Good morning, {firstName} ☀️
+            Good morning, {firstName} 
           </h1>
           <p className="text-slate-500">
             Here&apos;s what&apos;s fresh in your kitchen. Let&apos;s make the most of it.

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Refrigerator, Search, Plus, X } from "lucide-react";
+import { Refrigerator, Search, Plus, X, Utensils } from "lucide-react";
 import { getDaysUntilExpiration, formatDaysLeft } from "../utils/dateutils";
 import { useRouter } from "next/navigation";
 import ProductEditModal from "./ProductEditModal";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 interface Product {
   id: number;
@@ -17,11 +17,9 @@ interface Product {
   expirationDate?: string | null;
   imageUrl?: string | null;
   lifecycleStatus?: string; // Dodane do sprawdzania czy zjedzone
-  masterProductId: number;  // Dodane
+  masterProductId: number; // Dodane
   location: string;
 }
-
-
 
 export default function MyFridgeClient({
   initialProducts,
@@ -101,34 +99,38 @@ export default function MyFridgeClient({
     setShowSuggestions(false);
   };
 
- const productsWithDynamicStatus = useMemo(() => {
-    return initialProducts.map(product => {
+  const productsWithDynamicStatus = useMemo(() => {
+    return initialProducts.map((product) => {
       let displayStatus = product.status;
       const daysLeft = getDaysUntilExpiration(product.expirationDate);
 
       // Aktualizacja statusu tylko dla aktywnych produktów posiadających datę
-      if (product.lifecycleStatus !== 'CONSUMED' && product.lifecycleStatus !== 'WASTED' && daysLeft !== null) {
+      if (
+        product.lifecycleStatus !== "CONSUMED" &&
+        product.lifecycleStatus !== "WASTED" &&
+        daysLeft !== null
+      ) {
         if (daysLeft < 0) {
-          displayStatus = 'EXPIRED';
+          displayStatus = "EXPIRED";
         } else if (daysLeft <= 2) {
-          displayStatus = 'EXPIRING_SOON';
+          displayStatus = "EXPIRING_SOON";
         } else {
-          displayStatus = 'FRESH';
+          displayStatus = "FRESH";
         }
       }
 
       // Zwracamy produkt wzbogacony o nowe, wyliczone "w locie" dane
-      return { 
-        ...product, 
-        displayStatus, 
-        daysLeft 
+      return {
+        ...product,
+        displayStatus,
+        daysLeft,
       };
     });
   }, [initialProducts]);
 
   // 2. Licznik zakładek oparty na zaktualizowanych danych
   const expiringSoonCount = productsWithDynamicStatus.filter(
-    (p) => p.displayStatus === "EXPIRING_SOON"
+    (p) => p.displayStatus === "EXPIRING_SOON",
   ).length;
 
   // 3. Filtrowanie korzystające z nowej tablicy
@@ -170,6 +172,37 @@ export default function MyFridgeClient({
       default:
         return null;
     }
+  };
+
+  
+
+  const ProductImage = ({
+    imageUrl,
+    category,
+  }: {
+    imageUrl?: string | null;
+    category?: string;
+  }) => {
+    const [hasError, setHasError] = useState(false);
+
+    // Jeśli nie ma URL lub wystąpił błąd (404), pokazujemy ładny placeholder
+    if (!imageUrl || hasError) {
+      return (
+        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-xl border border-slate-100 flex-shrink-0 text-emerald-700">
+          <Refrigerator size={24} strokeWidth={2} />
+        </div>
+      );
+    }
+
+    // Używamy zwykłego <img> z onError zamiast backgroundImage
+    return (
+      <img
+        src={imageUrl}
+        alt="Product"
+        onError={() => setHasError(true)}
+        className="w-10 h-10 rounded-xl border border-slate-100 object-contain bg-white flex-shrink-0"
+      />
+    );
   };
 
   // Obsługa zapisu do bazy
@@ -217,11 +250,11 @@ export default function MyFridgeClient({
           location: "FRIDGE",
         });
         router.refresh();
-        
-      toast.success('Product added successfully!');
-} else {
-  toast.error('Failed to add product');
-}
+
+        toast.success("Product added successfully!");
+      } else {
+        toast.error("Failed to add product");
+      }
     } catch (error) {
       console.error("Błąd sieci:", error);
     } finally {
@@ -231,7 +264,6 @@ export default function MyFridgeClient({
 
   return (
     <>
-    
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
         <div className="p-5  items-start justify-between">
           <div>
@@ -313,16 +345,7 @@ export default function MyFridgeClient({
                   className="p-5 grid grid-cols-1 min-[450px]:grid-cols-[1.5fr_1fr_1fr_1fr] min-[300px]:grid-cols-2 max-[450px]:gap-2 items-center justify-items-between gap-4 hover:bg-slate-50/50 transition-colors"
                 >
                   <div className="flex items-center  gap-4 w-full max-[450px]:justify-start max-[300px]:justify-center">
-                    {product.imageUrl ? (
-                      <div
-                        className="w-10 h-10 rounded-xl border border-slate-100 bg-contain bg-no-repeat bg-center bg-white flex-shrink-0"
-                        style={{ backgroundImage: `url(${product.imageUrl})` }}
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-xl border border-slate-100 flex-shrink-0">
-                        📦
-                      </div>
-                    )}
+                    <ProductImage imageUrl={product.imageUrl} category={product.category} />
 
                     <div>
                       <p className="font-semibold text-slate-800 text-sm">
@@ -339,9 +362,9 @@ export default function MyFridgeClient({
                   </div>
 
                   <div className="flex items-center justify-center order-3 w-full max-[450px]:justify-end max-[450px]:order-2 max-[300px]:order-3 max-[300px]:justify-center">
-  {/* ZMIANA: Zamiast product.status podajemy product.displayStatus */}
-  {getStatusBadge(product.displayStatus)}
-</div>
+                    {/* ZMIANA: Zamiast product.status podajemy product.displayStatus */}
+                    {getStatusBadge(product.displayStatus)}
+                  </div>
 
                   <div className="text-sm font-medium text-slate-500 flex items-center order-4 justify-center w-full max-[450px]:justify-end max-[450px]:px-2 max-[300px]:justify-center">
                     {daysLeftText}
@@ -532,17 +555,17 @@ export default function MyFridgeClient({
         </div>
       )}
       {editingProduct && (
-  <ProductEditModal 
-    product={editingProduct} 
-    isOpen={!!editingProduct} 
-    onClose={() => setEditingProduct(null)} 
-    onSuccess={(message) => {
-      setEditingProduct(null); // Zamykamy modal
-      toast.success(message);  // Wywołujemy toasta z prawidłowego miejsca
-      router.refresh();        // Odświeżamy dane
-    }}
-  />
-)}
+        <ProductEditModal
+          product={editingProduct}
+          isOpen={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSuccess={(message) => {
+            setEditingProduct(null); // Zamykamy modal
+            toast.success(message); // Wywołujemy toasta z prawidłowego miejsca
+            router.refresh(); // Odświeżamy dane
+          }}
+        />
+      )}
     </>
   );
 }
