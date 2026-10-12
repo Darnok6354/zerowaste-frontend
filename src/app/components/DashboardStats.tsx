@@ -23,13 +23,22 @@ export default async function DashboardStats() {
       
       if (productsRes.ok) {
         const data = await productsRes.json();
-        // Twój Spring Boot (Page<ProductResponse>) zwraca listę wewnątrz pola 'content'
         const products = data.content || data; 
         
-        // Bierzemy pod uwagę tylko produkty, które nadal są w lodówce (ACTIVE)
-        const activeProducts = products.filter((p: any) => 
-          p.lifecycleStatus !== 'CONSUMED' && p.lifecycleStatus !== 'WASTED' && p.status === 'FRESH' || p.status === 'EXPIRING_SOON'
-        );
+        // --- ZMODYFIKOWANA LOGIKA FILTROWANIA ---
+        const activeProducts = products.filter((p: any) => {
+          // 1. Odrzucamy produkty wyrzucone lub zjedzone
+          if (p.lifecycleStatus === 'CONSUMED' || p.lifecycleStatus === 'WASTED') {
+            return false;
+          }
+
+          // 2. Wyliczamy status ważności "w locie"
+          const daysLeft = getDaysUntilExpiration(p.expirationDate);
+
+          // 3. Produkt to "fresh possibility", jeśli nie jest przeterminowany
+          // (daysLeft to null gdy produkt nie ma daty, co traktujemy jako świeże, w przeciwnym razie musi być >= 0)
+          return daysLeft === null || daysLeft >= 0;
+        });
         
         totalItems = activeProducts.length;
 
@@ -65,7 +74,7 @@ export default async function DashboardStats() {
       {/* Karta 1: Items in your fridge */}
       <div className="bg-white border border-slate-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div className="bg-emerald-50 text-emerald-700 p-2 rounded-xl w-fit mb-4">
-          <Refrigerator size={20} strokeWidth={2} />
+          <Refrigerator size={24} strokeWidth={2} />
         </div>
         <div>
           <p className="text-xs text-slate-500 font-medium mb-1">Items in your fridge</p>
@@ -77,7 +86,7 @@ export default async function DashboardStats() {
       {/* Karta 2: Need a little love */}
       <div className="bg-white border border-slate-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
         <div className="bg-orange-50 text-orange-600 p-2 rounded-xl w-fit mb-4">
-          <Clock size={20} strokeWidth={2} />
+          <Clock size={24} strokeWidth={2} />
         </div>
         <div>
           <p className="text-xs text-slate-500 font-medium mb-1">Need a little love</p>
@@ -90,7 +99,7 @@ export default async function DashboardStats() {
       <div className="bg-white border border-slate-100 rounded-2xl p-5 flex flex-col justify-between shadow-sm relative">
         <div className="flex justify-between items-start mb-4">
           <div className="bg-emerald-50 text-emerald-700 p-2 rounded-xl w-fit">
-            <Leaf size={20} strokeWidth={2} />
+            <Leaf size={24} strokeWidth={2} />
           </div>
         </div>
         <div>

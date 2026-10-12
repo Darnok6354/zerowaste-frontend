@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Refrigerator, Search, Plus, X, Utensils } from "lucide-react";
 import { getDaysUntilExpiration, formatDaysLeft } from "../utils/dateutils";
 import { useRouter } from "next/navigation";
@@ -185,6 +185,16 @@ export default function MyFridgeClient({
     category?: string;
   }) => {
     const [hasError, setHasError] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
+
+    useEffect(() => {
+      // Sprawdzamy, czy obrazek zdążył się zepsuć zanim React podpiął onError
+      if (imgRef.current && imgRef.current.complete) {
+        if (imgRef.current.naturalWidth === 0) {
+          setHasError(true);
+        }
+      }
+    }, [imageUrl]);
 
     // Jeśli nie ma URL lub wystąpił błąd (404), pokazujemy ładny placeholder
     if (!imageUrl || hasError) {
@@ -195,13 +205,14 @@ export default function MyFridgeClient({
       );
     }
 
-    // Używamy zwykłego <img> z onError zamiast backgroundImage
+    // Używamy zwykłego <img> z onError, refem i przezroczystym tekstem
     return (
       <img
+        ref={imgRef}
         src={imageUrl}
         alt="Product"
         onError={() => setHasError(true)}
-        className="w-10 h-10 rounded-xl border border-slate-100 object-contain bg-white flex-shrink-0"
+        className="w-10 h-10 rounded-xl border border-slate-100 object-contain bg-white flex-shrink-0 text-transparent"
       />
     );
   };
