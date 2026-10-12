@@ -32,6 +32,7 @@ export default function MyFridgeClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<"ALL" | "EXPIRING_SOON">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  console.log(token);
 
   // Stany modala i formularza
   const [editingProduct, setEditingProduct] = useState<any | null>(null);

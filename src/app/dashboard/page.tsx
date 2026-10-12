@@ -1,14 +1,20 @@
 import MyFridgeList from '../components/MyFridgeList';
-// import ExpiringSoonCard from '../components/ExpiringSoonCard'; // Odkomentuj gdy dodasz
+import ExpiringSoonCard from '../components/ExpiringSoonCard'; // Odkomentuj gdy dodasz
 import DashboardStats from '../components/DashboardStats';
 import LogoutButton from '../components/LogoutButton';
 import { createClient } from '../lib/server'; 
+import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   
   // Zmiana z getSession() na getUser() - bezpieczniejsze i gwarantuje świeże dane z serwera
   const { data: { user }, error } = await supabase.auth.getUser();
+
+  // STRAŻNIK: Jeśli wystąpił błąd autoryzacji lub nie ma użytkownika, wyrzuć do logowania
+  if (error || !user) {
+    redirect('/login'); // Jeśli Twój ekran logowania jest pod innym adresem (np. '/'), zmień to tutaj
+  }
 
   let firstName = "chef";
   
@@ -54,15 +60,14 @@ export default async function DashboardPage() {
         </div>
         
         <DashboardStats />
+        <ExpiringSoonCard/>
 
         <div className="md:block mt-2">
             <MyFridgeList />
         </div>
       </div>
       
-      <div className="md:col-span-12">
-        <LogoutButton />
-      </div>
+     
 
     </div>
   );

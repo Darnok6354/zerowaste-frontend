@@ -21,6 +21,7 @@ async function getFridgeProducts(): Promise<Product[]> {
   const params = new URLSearchParams();
   params.append('statuses', 'FRESH');
   params.append('statuses', 'EXPIRING_SOON');
+  params.append('statuses', 'EXPIRED');
   
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
