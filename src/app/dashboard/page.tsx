@@ -4,6 +4,7 @@ import DashboardStats from '../components/DashboardStats';
 import LogoutButton from '../components/LogoutButton';
 import { createClient } from '../lib/server'; 
 import { redirect } from 'next/navigation'
+import RecipeInspirationSection from '../components/RecipeInspirationSection';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -66,6 +67,8 @@ export default async function DashboardPage() {
             <MyFridgeList />
         </div>
       </div>
+
+      <RecipeInspirationSection />
       
      
 
