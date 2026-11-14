@@ -5,6 +5,7 @@ import LogoutButton from '../components/LogoutButton';
 import { createClient } from '../lib/server'; 
 import { redirect } from 'next/navigation'
 import RecipeInspirationSection from '../components/RecipeInspirationSection';
+import GenerateRecipesButton from '../components/GenerateRecipesButton';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -39,7 +40,7 @@ export default async function DashboardPage() {
           • Less waste, more good
         </p>
         <h1 className="text-3xl font-heading font-bold text-slate-800 mb-2">
-          Good morning, {firstName} ☀️
+          Good morning, {firstName} 
         </h1>
         <p className="text-sm text-slate-500 leading-relaxed">
           Here&apos;s what&apos;s fresh in your kitchen. Let&apos;s make the most of it.
@@ -61,14 +62,17 @@ export default async function DashboardPage() {
         </div>
         
         <DashboardStats />
+        
         <ExpiringSoonCard/>
-
+        <div className=" mb-2">
+        <GenerateRecipesButton />
+      </div>
         <div className="md:block mt-2">
             <MyFridgeList />
         </div>
       </div>
 
-      <RecipeInspirationSection />
+      
       
      
 

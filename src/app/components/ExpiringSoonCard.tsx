@@ -2,7 +2,6 @@ import { Clock, Sparkles, Utensils } from "lucide-react";
 import { createClient } from "../lib/server";
 import { getDaysUntilExpiration, formatDaysLeft } from "@/app/utils/dateutils"; // Importujemy funkcję do obliczania dni
 import ExpiringProductImage from "./ExpiringProductImage"; // Importujemy komponent do wyświetlania zdjęć produktów
-import GenerateRecipesButton from "./GenerateRecipesButton"; // Importujemy przycisk do generowania przepisów
 
 export default async function ExpiringSoonCard() {
   const supabase = await createClient();
@@ -114,7 +113,6 @@ export default async function ExpiringSoonCard() {
       </div>
 
       {/* Przycisk Generate Recipes */}
-      <GenerateRecipesButton />
 
       <p className="text-center text-[10px] text-[#a3794b] mt-4 font-medium uppercase tracking-wider">
         Good food deserves a second chance.

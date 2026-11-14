@@ -12,9 +12,7 @@ export default function TopBar() {
           </span>
         </Link>
 
-        <div>
-          <LogoutButton />
-        </div>
+        
       </div>
     </header>
   );
