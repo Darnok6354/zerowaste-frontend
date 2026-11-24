@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../lib/supabase"; // Zaktualizuj ścieżkę, jeśli jest inna
+import {API_URL} from '../lib/api'
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function RegisterForm() {
       // 3. Synchronizacja użytkownika z Twoją lokalną bazą w Dockerze
       if (data.user && token) {
         const syncResponse = await fetch(
-          "http://localhost:8080/api/users/sync",
+          `${API_URL}/api/users/sync`,
           {
             method: "POST",
             headers: {

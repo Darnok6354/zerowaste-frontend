@@ -2,6 +2,7 @@ import { Clock, Sparkles, Utensils } from "lucide-react";
 import { createClient } from "../lib/server";
 import { getDaysUntilExpiration, formatDaysLeft } from "@/app/utils/dateutils"; // Importujemy funkcję do obliczania dni
 import ExpiringProductImage from "./ExpiringProductImage"; // Importujemy komponent do wyświetlania zdjęć produktów
+import {API_URL} from '../lib/api'
 
 export default async function ExpiringSoonCard() {
   const supabase = await createClient();
@@ -12,7 +13,7 @@ export default async function ExpiringSoonCard() {
 
   if (token) {
     try {
-      const res = await fetch("http://localhost:8080/api/products?size=1000", {
+      const res = await fetch(`${API_URL}/api/products?size=1000`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
       });

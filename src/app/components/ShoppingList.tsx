@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { supabase } from "../lib/supabase";
+import {API_URL} from '../lib/api'
 
 type ShoppingItem = {
   id: number;
@@ -51,7 +52,7 @@ export default function ShoppingList() {
       const token = sessionData.session?.access_token;
       if (!token) return;
 
-      const res = await fetch("http://localhost:8080/api/master-products", {
+      const res = await fetch(`${API_URL}/api/master-products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -128,7 +129,7 @@ export default function ShoppingList() {
       const token = sessionData.session?.access_token;
       if (!token) return;
 
-      const res = await fetch("http://localhost:8080/api/shopping-list", {
+      const res = await fetch(`${API_URL}/api/shopping-list`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setItems(await res.json());
@@ -143,7 +144,7 @@ export default function ShoppingList() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
-      const res = await fetch("http://localhost:8080/api/shopping-list", {
+      const res = await fetch(`${API_URL}/api/shopping-list`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -185,7 +186,7 @@ export default function ShoppingList() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
-      await fetch(`http://localhost:8080/api/shopping-list/${id}/toggle`, {
+      await fetch(`${API_URL}/api/shopping-list/${id}/toggle`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -204,7 +205,7 @@ export default function ShoppingList() {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
-      await fetch(`http://localhost:8080/api/shopping-list/${id}`, {
+      await fetch(`${API_URL}/api/shopping-list/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -226,7 +227,7 @@ export default function ShoppingList() {
 
       await Promise.all(
         completed.map((item) =>
-          fetch(`http://localhost:8080/api/shopping-list/${item.id}`, {
+          fetch(`${API_URL}/api/shopping-list/${item.id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
           }),

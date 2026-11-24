@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
+import {API_URL} from '../lib/api'
 
 const CACHE_KEY = "fridge_suggested_recipes";
 const CACHE_EXPIRY_MS = 3 * 60 * 60 * 1000;
@@ -39,7 +40,7 @@ export default function SuggestedRecipes() {
         const token = sessionData.session?.access_token;
         if (token) {
           const resFav = await fetch(
-            "http://localhost:8080/api/saved-recipes",
+            `${API_URL}/api/saved-recipes`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -82,7 +83,7 @@ export default function SuggestedRecipes() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
 
-      const res = await fetch("http://localhost:8080/api/recipes/suggested", {
+      const res = await fetch(`${API_URL}/api/recipes/suggested`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -123,11 +124,11 @@ export default function SuggestedRecipes() {
       const token = sessionData.session?.access_token;
 
       let response = isCurrentlyFav
-        ? await fetch(`http://localhost:8080/api/saved-recipes/${recipe.id}`, {
+        ? await fetch(`${API_URL}/api/saved-recipes/${recipe.id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
           })
-        : await fetch("http://localhost:8080/api/saved-recipes", {
+        : await fetch(`${API_URL}/api/saved-recipes`, {
             method: "POST",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -167,7 +168,7 @@ export default function SuggestedRecipes() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       const res = await fetch(
-        `http://localhost:8080/api/recipes/${id}/details`,
+        `${API_URL}/api/recipes/${id}/details`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
       if (res.ok) setRecipeDetails(await res.json());
@@ -197,7 +198,7 @@ export default function SuggestedRecipes() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       
-      const res = await fetch("http://localhost:8080/api/products/cook-suggested", {
+      const res = await fetch(`${API_URL}/api/products/cook-suggested`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -228,7 +229,7 @@ export default function SuggestedRecipes() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
 
-      const res = await fetch("http://localhost:8080/api/shopping-list", {
+      const res = await fetch(`${API_URL}/api/shopping-list`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

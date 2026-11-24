@@ -2,6 +2,7 @@ import { Refrigerator, Clock, Leaf } from "lucide-react";
 import { createClient } from "../lib/server";
 // Importujemy funkcję do obliczania dni, którą stworzyliśmy wcześniej
 import { getDaysUntilExpiration } from "@/app/utils/dateutils"; 
+import {API_URL} from '../lib/api'
 
 export default async function DashboardStats() {
   const supabase = await createClient();
@@ -16,7 +17,7 @@ export default async function DashboardStats() {
     try {
       // --- 1. POBIERANIE PRODUKTÓW (kolumna 1 i 2) ---
       // Ustawiamy duży size, żeby pobrać całą lodówkę
-      const productsRes = await fetch('http://localhost:8080/api/products?size=1000', {
+      const productsRes = await fetch(`${API_URL}/api/products?size=1000`, {
         headers: { 'Authorization': `Bearer ${token}` },
         cache: 'no-store' // Zawsze świeże dane
       });
@@ -54,7 +55,7 @@ export default async function DashboardStats() {
       const month = now.getMonth() + 1; // JavaScript liczy miesiące od 0, więc dodajemy 1
 
       // Upewnij się, że Twój @RequestMapping to "/api/statistics" (lub zmień na "statistic" jeśli masz bez 's' na końcu)
-      const statsRes = await fetch(`http://localhost:8080/api/statistics/monthly`, {
+      const statsRes = await fetch(`${API_URL}/api/statistics/monthly`, {
         headers: { 'Authorization': `Bearer ${token}` },
         cache: 'no-store'
       });

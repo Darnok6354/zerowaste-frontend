@@ -1,5 +1,6 @@
 import { createClient } from "../lib/server";
 import MyFridgeClient from "./MyFridgeClient"; // Zaimportuj nowo stworzony komponent
+import {API_URL} from '../lib/api'
 
 interface Product {
   id: number;
@@ -32,7 +33,7 @@ async function getFridgeProducts(): Promise<Product[]> {
   }
 
   try {
-    const res = await fetch(`http://localhost:8080/api/products?${params.toString()}`, { 
+    const res = await fetch(`${API_URL}/api/products?${params.toString()}`, { 
       cache: 'no-store',
       headers: {
         'Authorization': `Bearer ${token}`,

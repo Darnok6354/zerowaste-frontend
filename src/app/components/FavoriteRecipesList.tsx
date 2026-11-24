@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, Heart, Clock, X, Users, ExternalLink, ChefHat } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
+import {API_URL} from '../lib/api'
 
 export default function FavoriteRecipesList() {
   const [recipes, setRecipes] = useState<any[]>([]);
@@ -25,7 +26,7 @@ export default function FavoriteRecipesList() {
       const token = sessionData.session?.access_token;
       if (!token) return;
 
-      const res = await fetch("http://localhost:8080/api/saved-recipes", {
+      const res = await fetch(`${API_URL}/api/saved-recipes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -49,7 +50,7 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
 
-      const response = await fetch(`http://localhost:8080/api/saved-recipes/${spoonacularId}`, {
+      const response = await fetch(`${API_URL}/api/saved-recipes/${spoonacularId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -75,7 +76,7 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
 
-      const res = await fetch(`http://localhost:8080/api/recipes/${spoonacularId}/details`, {
+      const res = await fetch(`${API_URL}/api/recipes/${spoonacularId}/details`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -112,7 +113,7 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       
-      const res = await fetch("http://localhost:8080/api/products/cook-suggested", {
+      const res = await fetch(`${API_URL}/api/products/cook-suggested`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,

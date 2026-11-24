@@ -6,6 +6,7 @@ import { getDaysUntilExpiration, formatDaysLeft } from "../utils/dateutils";
 import { useRouter } from "next/navigation";
 import ProductEditModal from "./ProductEditModal";
 import toast from "react-hot-toast";
+import {API_URL} from '../lib/api'
 
 interface Product {
   id: number;
@@ -66,7 +67,7 @@ export default function MyFridgeClient({
     try {
       // Użycie nowego endpointu MasterProductController i wstrzyknięcie tokenu
       const res = await fetch(
-        `http://localhost:8080/api/master-products?query=${value}`,
+        `${API_URL}/api/master-products?query=${value}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -239,7 +240,7 @@ export default function MyFridgeClient({
         location: formData.location,
       };
 
-      const response = await fetch("http://localhost:8080/api/products", {
+      const response = await fetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

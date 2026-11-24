@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { API_URL } from "../lib/api";
 
 // Typ bazujący na Twoim backendowym ProductResponse
 type Product = {
@@ -56,7 +57,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onSuccess }
         location: formData.location
       };
 
-      const res = await fetch(`http://localhost:8080/api/products/${product.id}`, {
+      const res = await fetch(`${API_URL}/api/products/${product.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onSuccess }
     setIsLoading(true);
     try {
       const token = await getAuthToken();
-      const res = await fetch(`http://localhost:8080/api/products/${product.id}/lifecycle`, {
+      const res = await fetch(`${API_URL}/api/products/${product.id}/lifecycle`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ export default function ProductEditModal({ product, isOpen, onClose, onSuccess }
     setIsLoading(true);
     try {
       const token = await getAuthToken();
-      const res = await fetch(`http://localhost:8080/api/products/${product.id}`, {
+      const res = await fetch(`${API_URL}/api/products/${product.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

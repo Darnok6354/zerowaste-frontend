@@ -13,6 +13,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import {API_URL} from '../lib/api'
 
 const CACHE_KEY = "fridge_suggested_recipes";
 const CACHE_EXPIRY_MS = 3 * 60 * 60 * 1000; // 3 godziny w milisekundach
@@ -56,7 +57,7 @@ export default function RecipeInspirationSection() {
         const token = sessionData.session?.access_token;
         if (!token) return;
 
-        const res = await fetch("http://localhost:8080/api/saved-recipes", {
+        const res = await fetch(`${API_URL}/api/saved-recipes`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -111,14 +112,14 @@ export default function RecipeInspirationSection() {
 
       if (isCurrentlyFav) {
         response = await fetch(
-          `http://localhost:8080/api/saved-recipes/${recipe.id}`,
+          `${API_URL}/api/saved-recipes/${recipe.id}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
           },
         );
       } else {
-        response = await fetch("http://localhost:8080/api/saved-recipes", {
+        response = await fetch(`${API_URL}/api/saved-recipes`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -166,7 +167,7 @@ export default function RecipeInspirationSection() {
         const { data: sessionData } = await supabase.auth.getSession();
         const token = sessionData.session?.access_token;
 
-        const res = await fetch("http://localhost:8080/api/recipes/suggested", {
+        const res = await fetch(`${API_URL}/api/recipes/suggested`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -203,7 +204,7 @@ export default function RecipeInspirationSection() {
       const token = sessionData.session?.access_token;
 
       const res = await fetch(
-        `http://localhost:8080/api/recipes/${id}/details`,
+        `${API_URL}/api/recipes/${id}/details`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },

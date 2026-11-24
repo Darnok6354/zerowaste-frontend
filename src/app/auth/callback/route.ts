@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../lib/server' // Zaktualizuj ścieżkę do swojego server.ts, jeśli używasz aliasów, lub użyj '../lib/server'
+import {API_URL} from '../../lib/api' // Importuj stałą API_URL z pliku constants.ts
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
 
       try {
         // Synchronizacja ze Spring Bootem
-        await fetch('http://localhost:8080/api/users/sync', {
+        await fetch(`${API_URL}/api/users/sync`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
