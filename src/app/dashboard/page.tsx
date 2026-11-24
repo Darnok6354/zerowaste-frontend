@@ -31,8 +31,8 @@ export default async function DashboardPage() {
     }
   }
 
-  return (
-    <div className="p-4 md:p-8 max-w-lg mx-auto md:max-w-7xl md:grid md:grid-cols-12 md:gap-8">
+ return (
+    <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
       
       {/* Mobilny nagłówek */}
       <header className="mb-6 md:hidden">
@@ -47,34 +47,39 @@ export default async function DashboardPage() {
         </p>
       </header>
 
-      {/* Lewa kolumna (Główna zawartość) */}
-      <div className="md:col-span-8 flex flex-col">
-        <div className="hidden md:block mb-8">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-            • Less waste, more good
-          </p>
-          <h1 className="text-4xl font-heading font-bold text-slate-800 mb-2">
-            Good morning, {firstName} 
-          </h1>
-          <p className="text-slate-500">
-            Here&apos;s what&apos;s fresh in your kitchen. Let&apos;s make the most of it.
-          </p>
-        </div>
-        
-        <DashboardStats />
-        
-        <ExpiringSoonCard/>
-        <div className=" mb-2">
-        <GenerateRecipesButton />
-      </div>
-        <div className="md:block mt-2">
-            <MyFridgeList />
-        </div>
+      {/* Desktopowy nagłówek (na pełną szerokość) */}
+      <div className="hidden md:block mb-8">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          • Less waste, more good
+        </p>
+        <h1 className="text-4xl font-heading font-bold text-slate-800 mb-2">
+          Good morning, {firstName} 
+        </h1>
+        <p className="text-slate-500">
+          Here&apos;s what&apos;s fresh in your kitchen. Let&apos;s make the most of it.
+        </p>
       </div>
 
+      {/* Statystyki (na pełną szerokość pod nagłówkiem) */}
+      <div className="mb-8">
+        <DashboardStats />
+      </div>
       
-      
-     
+      {/* Prawdziwy Desktop Grid (Siatka) */}
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8">
+        
+        {/* Lewa strona - szersza (8/12) */}
+        <div className="md:col-span-8">
+          <MyFridgeList />
+        </div>
+
+        {/* Prawa strona - boczny panel akcji (4/12) */}
+        <div className="md:col-span-4 flex flex-col gap-6">
+          <GenerateRecipesButton />
+          <ExpiringSoonCard />
+        </div>
+
+      </div>
 
     </div>
   );

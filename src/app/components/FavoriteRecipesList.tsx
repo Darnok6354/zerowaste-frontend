@@ -94,6 +94,42 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
     setRecipeDetails(null);
   };
 
+  const handleCookRecipe = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Sprawdzamy czy mamy załadowane detale i składniki
+    if (!recipeDetails || !recipeDetails.extendedIngredients) {
+      toast.error("Could not load recipe ingredients.");
+      return;
+    }
+
+    const ingredientsToConsume = recipeDetails.extendedIngredients.map((ing: any) => ({
+      name: ing.name,
+      amount: ing.amount || 1.0 
+    }));
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      
+      const res = await fetch("http://localhost:8080/api/products/cook-suggested", {
+        method: "POST",
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ingredients: ingredientsToConsume })
+      });
+
+      if (!res.ok) throw new Error("Błąd podczas gotowania");
+      
+      toast.success("Used ingredients have been removed from your fridge. ", { duration: 4000 });
+      closeModal(); 
+    } catch (error) {
+      toast.error("Failed to update your fridge inventory.");
+    }
+  };
+
   return (
     <div className="pb-12 animate-in fade-in duration-500">
       {isLoadingList ? (
@@ -110,18 +146,18 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
           <p className="text-sm">Recipes you save will appear here.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2  gap-5">
           {recipes.map((recipe) => (
             <div 
               key={recipe.id} 
               onClick={() => handleRecipeClick(recipe.spoonacularRecipeId)}
-              className="bg-white border border-slate-100 rounded-[1.5rem] overflow-hidden shadow-sm cursor-pointer hover:border-rose-200 hover:shadow-md transition-all group"
+              className="bg-white border border-slate-100 rounded-[1.5rem] overflow-hidden shadow-sm cursor-pointer hover:border-emerald-200 hover:shadow-md transition-all group"
             >
               <div className="relative h-48 w-full bg-slate-50">
                 <img src={recipe.imageUrl} alt={recipe.title} className="w-full h-full object-cover" />
                 
                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-slate-700 flex items-center gap-1.5 shadow-sm">
-                  <ChefHat size={12} className="text-rose-500" /> Saved Recipe
+                   Saved Recipe
                 </div>
                 
                 <button 
@@ -133,7 +169,7 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
               </div>
 
               <div className="p-5">
-                <h3 className="font-bold text-[17px] text-slate-800 leading-tight group-hover:text-rose-600 transition-colors">
+                <h3 className="font-bold text-[17px] text-slate-800 leading-tight group-hover:text-[#2d5a45] transition-colors">
                   {recipe.title}
                 </h3>
               </div>
@@ -164,18 +200,18 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
                 <div className="h-64 w-full relative bg-slate-50">
                   <img src={recipeDetails.image} alt={recipeDetails.title} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                  <h2 className="absolute bottom-6 left-6 right-6 text-2xl md:text-3xl font-bold text-white leading-tight">
-                    {recipeDetails.title}
-                  </h2>
                 </div>
 
                 <div className="p-6 md:p-8 space-y-8">
+                  <h2 className=" text-2xl md:text-3xl font-bold text-slate-800 leading-tight">
+                    {recipeDetails.title}
+                  </h2>
                   <div className="flex flex-wrap gap-3">
                     <div className="bg-slate-50 border border-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-                      <Clock size={16} className="text-rose-500" /> {recipeDetails.readyInMinutes} min
+                      <Clock size={16} className="text-[#a3794b]" /> {recipeDetails.readyInMinutes} min
                     </div>
                     <div className="bg-slate-50 border border-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-                      <Users size={16} className="text-rose-500" /> {recipeDetails.servings} servings
+                      <Users size={16} className="text-[#a3794b]" /> {recipeDetails.servings} servings
                     </div>
                   </div>
 
@@ -186,6 +222,15 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
                         className="text-slate-600 text-sm md:text-base leading-relaxed prose prose-rose prose-p:mb-4 prose-a:text-rose-600 prose-strong:text-slate-800" 
                         dangerouslySetInnerHTML={{ __html: recipeDetails.instructions }} 
                       />
+                      <div className="pt-6 mt-4 border-t border-slate-100">
+                    <button 
+                      onClick={handleCookRecipe}
+                      className="w-full bg-[#2d5a45] hover:bg-[#234735] text-white font-bold py-4 rounded-[1.5rem] flex items-center justify-center gap-2 transition-colors shadow-sm"
+                    >
+                      I cooked this! 
+                    </button>
+                    
+                  </div>
                     </div>
                   )}
 
@@ -197,7 +242,7 @@ const removeFavorite = async (e: React.MouseEvent, spoonacularId: number) => {
                         rel="noreferrer"
                         className="flex items-center justify-center gap-2 w-full bg-[#f8f9fa] hover:bg-[#f1f3f5] text-slate-700 font-semibold py-4 rounded-2xl transition-colors"
                       >
-                        Read full recipe on source <ExternalLink size={18} />
+                        Read full recipe on source 
                       </a>
                     </div>
                   )}

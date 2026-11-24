@@ -4,22 +4,33 @@ import { ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function RecipesPage() {
   return (
-    <div className="p-4 md:p-8 max-w-lg mx-auto flex flex-col min-h-screen">
+    <div className="p-4 md:p-8 w-full max-w-7xl mx-auto flex flex-col min-h-screen">
       
       {/* Nagłówek powrotny */}
-      <div className="flex items-center gap-4 mb-8 pt-2">
-        <Link 
-          href="/dashboard" 
-          className="p-2.5 bg-white rounded-full shadow-sm border border-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
-        >
-          <ChevronLeft size={22} strokeWidth={2.5} />
-        </Link>
-        <div>
-          <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            Recipe Ideas  
-          </h1>
-          <p className="text-xs text-slate-500">Based on your fridge inventory</p>
-        </div>
+       {/* Mobilny nagłówek */}
+      <header className="mb-6 md:hidden">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+          • Less waste, more good
+        </p>
+        <h1 className="text-3xl font-heading font-bold text-slate-800 mb-2">
+          Good food. Second chances.
+        </h1>
+        <p className="text-sm text-slate-500 leading-relaxed">
+         A little inspiration, made from what you already have.
+        </p>
+      </header>
+
+      {/* Desktopowy nagłówek (na pełną szerokość) */}
+      <div className="hidden md:block mb-8">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          • Less waste, more good
+        </p>
+        <h1 className="text-4xl font-heading font-bold text-slate-800 mb-2">
+           Good food. Second chances.
+        </h1>
+        <p className="text-slate-500">
+          A little inspiration, made from what you already have.
+        </p>
       </div>
       
       {/* Nowy Komponent z przyciskiem do regeneracji i listą kafelków */}

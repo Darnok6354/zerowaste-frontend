@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Refrigerator, Heart, User, ChefHat } from "lucide-react";
+import { Home, Refrigerator, Heart, User, ChefHat, ShoppingCart } from "lucide-react";
 
 export default function BottomNav() {
   // Pobieramy aktualną ścieżkę (np. "/", "/recipes", "/favorites")
@@ -51,6 +51,16 @@ export default function BottomNav() {
           {/* Opcjonalnie: serduszko może być wypełnione gdy jesteśmy na podstronie favorites */}
           <Heart size={24}  />
           <span className="text-[10px] mt-1 font-medium">Favorites</span>
+        </Link>
+
+        <Link 
+          href="/shopping-list" 
+          className={`flex flex-col items-center justify-center w-full transition-colors ${
+            isActive("/shopping-list") ? "text-emerald-800" : "text-slate-400 hover:text-emerald-800"
+          }`}
+        >
+          <ShoppingCart size={24} />
+          <span className="text-[10px] mt-1 font-medium">List</span>
         </Link>
         
         <Link 

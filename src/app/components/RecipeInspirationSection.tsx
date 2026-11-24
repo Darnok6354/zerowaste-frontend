@@ -327,7 +327,7 @@ export default function RecipeInspirationSection() {
         </div>
       )}
 
-      {/* MODAL Z DETALAMI PRZEPISU */}
+     {/* MODAL Z DETALAMI PRZEPISU */}
       {selectedRecipeId !== null && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden flex flex-col relative animate-in zoom-in-95 duration-200">
@@ -360,7 +360,7 @@ export default function RecipeInspirationSection() {
                   </h2>
                 </div>
 
-                <div className="p-6 md:p-8 space-y-8">
+                <div className="p-6 md:p-8 space-y-6">
                   {/* Pigułki z czasem i porcjami */}
                   <div className="flex flex-wrap gap-3">
                     <div className="bg-slate-50 border border-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
@@ -373,62 +373,9 @@ export default function RecipeInspirationSection() {
                     </div>
                   </div>
 
-                  {/* NOWA SEKCJA: LISTA SKŁADNIKÓW */}
-                  {selectedBaseRecipe && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
-                      {/* Co masz w lodówce */}
-                      <div>
-                        <h3 className="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                          
-                          Ingredients you have
-                        </h3>
-                        <ul className="space-y-2">
-                          {selectedBaseRecipe.usedIngredients.map(
-                            (ing: any) => (
-                              <li
-                                key={ing.id}
-                                className="text-sm text-slate-600 flex items-start gap-2"
-                              >
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></span>
-                                <span className="leading-tight">
-                                  {ing.original}
-                                </span>
-                              </li>
-                            ),
-                          )}
-                        </ul>
-                      </div>
-
-                      {/* Czego Ci brakuje */}
-                      {selectedBaseRecipe.missedIngredients?.length > 0 && (
-                        <div>
-                          <h3 className="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
-                            
-                            Missing ingredients
-                          </h3>
-                          <ul className="space-y-2">
-                            {selectedBaseRecipe.missedIngredients.map(
-                              (ing: any) => (
-                                <li
-                                  key={ing.id}
-                                  className="text-sm text-slate-600 flex items-start gap-2"
-                                >
-                                  <span className="w-1.5 h-1.5 rounded-full bg-orange-400 mt-1.5 flex-shrink-0"></span>
-                                  <span className="leading-tight">
-                                    {ing.original}
-                                  </span>
-                                </li>
-                              ),
-                            )}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   {/* Instrukcje Krok po Kroku */}
                   {recipeDetails.instructions && (
-                    <div className="space-y-3 pt-6 border-t border-slate-100">
+                    <div className="space-y-3 pt-2">
                       <h3 className="text-lg font-bold text-slate-800">
                         Instructions
                       </h3>
@@ -438,20 +385,6 @@ export default function RecipeInspirationSection() {
                           __html: recipeDetails.instructions,
                         }}
                       />
-                    </div>
-                  )}
-
-                  {/* Link zewnętrzny do źródła */}
-                  {recipeDetails.sourceUrl && (
-                    <div className="pt-4 border-t border-slate-100">
-                      <a
-                        href={recipeDetails.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-center gap-2 w-full bg-[#f8f9fa] hover:bg-[#f1f3f5] text-slate-700 font-semibold py-4 rounded-2xl transition-colors"
-                      >
-                        Read full recipe on source <ExternalLink size={18} />
-                      </a>
                     </div>
                   )}
                 </div>

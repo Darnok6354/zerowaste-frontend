@@ -67,13 +67,13 @@ export default async function ExpiringSoonCard() {
         </div>
       </div>
 
-      <p className="text-[#966b39] text-sm mb-5 pr-8">
+      <p className="text-[#966b39] text-sm mb-5 pr-4">
         A little love before it&apos;s too late. Let&apos;s put these
         ingredients to good use.
       </p>
 
-      {/* Pozioma lista produktów (scrollowana) */}
-      <div className="flex gap-4 overflow-x-auto pb-4 mb-2 snap-x hide-scrollbar">
+      {/* Mobile: poziomy scroll | Desktop: pionowa lista */}
+      <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible md:max-h-[420px] md:overflow-y-auto pb-4 md:pb-1 mb-2 snap-x md:snap-none hide-scrollbar">
         {expiringProducts.map((product) => {
           const daysLeft = getDaysUntilExpiration(product.expirationDate);
           const isExpired = daysLeft !== null && daysLeft < 0;
@@ -81,38 +81,39 @@ export default async function ExpiringSoonCard() {
           return (
             <div
               key={product.id}
-              className="bg-white border border-[#f5e6c7] rounded-2xl p-4 min-w-[160px] flex-shrink-0 flex gap-3 snap-start shadow-sm"
+              className="bg-white border border-[#f5e6c7] rounded-2xl p-3.5 min-w-[160px] md:min-w-0 md:w-full flex-shrink-0 flex items-center gap-3 snap-start shadow-sm"
             >
-              <div className="w-10 h-10 rounded-xl border border-slate-100 object-contain bg-white flex-shrink-0 text-transparent">
+              <div className="w-10 h-10 rounded-xl border border-slate-100 object-contain bg-white flex-shrink-0 text-transparent overflow-hidden">
                 <ExpiringProductImage
                   imageUrl={product.imageUrl}
                   name={product.name}
                 />
               </div>
-              <div className="flex flex-col">
-                <p className="font-bold text-sm text-slate-800 leading-tight mb-0.5 truncate max-w-[90px]">
+
+              <div className="flex flex-col min-w-0 flex-1">
+                <p className="font-bold text-sm text-slate-800 leading-tight mb-0.5 truncate max-w-[90px] md:max-w-none">
                   {product.name}
                 </p>
-                <p className="text-[11px] text-slate-500 mb-2">
-                  {product.quantity} {product.unit.toLowerCase()} left
-                </p>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1.5 mt-0.5">
+                  <p className="text-[11px] text-slate-500">
+                    {product.quantity} {product.unit.toLowerCase()} left
+                  </p>
 
-                <div
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md w-fit ${
-                    isExpired
-                      ? "bg-red-50 text-red-600"
-                      : "bg-[#fff9eb] text-[#a3794b]"
-                  }`}
-                >
-                  {formatDaysLeft(daysLeft)}
+                  <div
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-md w-fit ${
+                      isExpired
+                        ? "bg-red-50 text-red-600"
+                        : "bg-[#fff9eb] text-[#a3794b]"
+                    }`}
+                  >
+                    {formatDaysLeft(daysLeft)}
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
-
-      {/* Przycisk Generate Recipes */}
 
       <p className="text-center text-[10px] text-[#a3794b] mt-4 font-medium uppercase tracking-wider">
         Good food deserves a second chance.
