@@ -27,9 +27,10 @@ export async function middleware(request: NextRequest) {
 
   const isLoginPage = request.nextUrl.pathname.startsWith('/login')
   const isHomePage = request.nextUrl.pathname === '/'
+  const isRegisterPage = request.nextUrl.pathname.startsWith('/register')
 
-  // 1. Użytkownik NIEZALOGOWANY próbuje wejść gdzie indziej niż logowanie
-  if (!user && !isLoginPage) {
+  // 1. Użytkownik NIEZALOGOWANY próbuje wejść gdzie indziej niż logowanie lub rejestracja
+  if (!user && !isLoginPage && !isRegisterPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
