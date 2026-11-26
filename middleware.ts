@@ -2,7 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Inicjalizacja odpowiedzi, aby móc nadpisać ciasteczka w razie odświeżenia tokenu
+  const pathname = request.nextUrl.pathname
+
+  // Callback OAuth musi być dostępny bez aktywnej sesji
+  if (pathname === '/auth/callback') {
+    return NextResponse.next()
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -10,10 +16,16 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll() },
+        getAll() {
+          return request.cookies.getAll()
+        },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
+
           supabaseResponse = NextResponse.next({ request })
+
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           )
@@ -22,19 +34,20 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Bezpieczne sprawdzenie użytkownika na serwerze
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login')
-  const isHomePage = request.nextUrl.pathname === '/'
-  const isRegisterPage = request.nextUrl.pathname.startsWith('/register')
+  const isLoginPage = pathname.startsWith('/login')
+  const isHomePage = pathname === '/'
+  const isRegisterPage = pathname.startsWith('/register')
 
-  // 1. Użytkownik NIEZALOGOWANY próbuje wejść gdzie indziej niż logowanie lub rejestracja
+  // Niezalogowany użytkownik
   if (!user && !isLoginPage && !isRegisterPage) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // 2. Użytkownik ZALOGOWANY próbuje wejść na logowanie lub stronę główną
+  // Zalogowany użytkownik
   if (user && (isLoginPage || isHomePage)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
@@ -42,7 +55,6 @@ export async function middleware(request: NextRequest) {
   return supabaseResponse
 }
 
-// Określamy, na jakich ścieżkach middleware ma działać (ignorujemy pliki statyczne, obrazki itp.)
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
