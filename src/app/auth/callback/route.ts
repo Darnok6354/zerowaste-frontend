@@ -1,25 +1,46 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { API_URL } from '../../lib/api'
 
+function resolveBaseUrl(request: NextRequest, headerStore: Awaited<ReturnType<typeof headers>>): string {
+  const forwardedHost = headerStore.get('x-forwarded-host')
+  const forwardedProto = headerStore.get('x-forwarded-proto') ?? 'https'
+
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`
+  }
+
+  return new URL(request.url).origin
+}
+
+function sanitizeNextPath(rawNext: string | null): string {
+  if (!rawNext || !rawNext.startsWith('/') || rawNext.startsWith('//')) {
+    return '/dashboard'
+  }
+  return rawNext
+}
+
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
+  const headerStore = await headers()
+  const baseUrl = resolveBaseUrl(request, headerStore)
+
   const code = searchParams.get('code')
   const errorParam = searchParams.get('error')
-  const next = searchParams.get('next') ?? '/dashboard'
+  const nextPath = sanitizeNextPath(searchParams.get('next'))
 
   if (errorParam) {
     console.error('OAuth provider error:', errorParam, searchParams.get('error_description'))
-    return NextResponse.redirect(`${origin}/login?error=oauth_failed`)
+    return NextResponse.redirect(`${baseUrl}/login?error=oauth_failed`)
   }
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=missing_code`)
+    return NextResponse.redirect(`${baseUrl}/login?error=missing_code`)
   }
 
   const cookieStore = await cookies()
-  const redirectUrl = new URL(next, origin)
+  const redirectUrl = new URL(nextPath, baseUrl)
   const response = NextResponse.redirect(redirectUrl)
 
   const supabase = createServerClient(
@@ -44,16 +65,20 @@ export async function GET(request: NextRequest) {
 
   if (error || !data.session) {
     console.error('exchangeCodeForSession failed:', error?.message)
-    return NextResponse.redirect(`${origin}/login?error=session_exchange_failed`)
+    return NextResponse.redirect(`${baseUrl}/login?error=session_exchange_failed`)
   }
 
   const user = data.session.user
   const token = data.session.access_token
-  const googleName = user.user_metadata?.full_name || user.user_metadata?.name || 'User'
-  const firstName = googleName.split(' ')[0]
+  const googleName =
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    user.email?.split('@')[0] ||
+    'User'
+  const firstName = googleName.trim().split(/\s+/)[0] || 'User'
 
   try {
-    await fetch(`${API_URL}/api/users/sync`, {
+    const syncResponse = await fetch(`${API_URL}/api/users/sync`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,6 +90,11 @@ export async function GET(request: NextRequest) {
         firstName,
       }),
     })
+
+    if (!syncResponse.ok) {
+      const errorText = await syncResponse.text().catch(() => '')
+      console.error('Backend /api/users/sync non-OK status:', syncResponse.status, errorText)
+    }
   } catch (e) {
     console.error('Google user sync error with backend:', e)
   }
